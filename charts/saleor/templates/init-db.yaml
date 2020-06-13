@@ -1,0 +1,69 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "saleor.fullname" . }}-migrate
+  labels:
+    {{- include "saleor.labels" . | nindent 4 }}
+  annotations:
+    helm.sh/hook: pre-upgrade,post-install
+spec:
+  template:
+    metadata:
+    {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      labels:
+        {{- include "saleor.selectorLabels" . | nindent 8 }}
+    spec:
+      restartPolicy: "Never"
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "saleor.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - bash
+            - -c
+            - |
+              #!/bin/bash
+              python manage.py migrate && \
+              python manage.py collectstatic --noinput;
+          env:
+            - name: STOREFRONT_URL
+              value: http://storefront:3000/
+            - name: DASHBOARD_URL
+              value: http://dashboard:9000/
+            - name: CELERY_BROKER_URL
+              value: {{ template "saleor.redis" . }}
+            - name: DEFAULT_FROM_EMAIL
+              value: {{ .Values.defaultFromEmail }}
+            - name: DATABASE_URL
+              value: {{ template "saleor.postgresql" . }}
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secretKey.name }}
+                  key: {{ .Values.secretKey.key }}
+          resources:
+            {{- toYaml .Values.migrateHook.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

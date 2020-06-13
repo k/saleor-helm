@@ -1,0 +1,5 @@
+owner: k
+git-repo: saleor-helm
+package-path: .deploy
+charts-repo: https://k.github.io/saleor-helm
+index-path: ./index.yaml

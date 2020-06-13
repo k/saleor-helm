@@ -1,0 +1,13 @@
+apiVersion: v2
+name: saleor
+description: Saleor Graphql E-commerce Helm Chart
+type: application
+version: 0.1.0
+appVersion: 2.10.0
+dependencies:
+- name: postgresql
+  version: ^8.10.5
+  repository: https://charts.bitnami.com/bitnami
+- name: redis
+  version: ^10.7.1
+  repository: https://charts.bitnami.com/bitnami
