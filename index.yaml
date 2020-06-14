@@ -1,0 +1,33 @@
+apiVersion: v1
+entries:
+  dashboard:
+  - apiVersion: v2
+    appVersion: 2.10.0
+    created: "2020-06-14T08:39:44.408779-04:00"
+    description: Dashboard for Saleo
+    digest: 2de87dd81068691ffe2f869e62ed3301758edd8b0ce3839aa4d211d1c29fa701
+    name: dashboard
+    urls:
+    - https://github.com/k/saleor-helm/releases/download/dashboard-0.1.0/dashboard-0.1.0.tgz
+    version: 0.1.0
+  saleor:
+  - apiVersion: v2
+    appVersion: 2.10.0
+    created: "2020-06-14T08:39:44.487471-04:00"
+    description: Saleor Graphql E-commerce Helm Chart
+    digest: 68c0c382c737200a5225763f8e18292f3987b04b15ec05e448824e9c69ce1384
+    name: saleor
+    urls:
+    - https://github.com/k/saleor-helm/releases/download/saleor-0.1.0/saleor-0.1.0.tgz
+    version: 0.1.0
+  storefront:
+  - apiVersion: v2
+    appVersion: 2.10.0
+    created: "2020-06-14T08:39:44.557428-04:00"
+    description: Storefont Saleor
+    digest: 27b4f4bdf3e363457d75bb27b876f3755115b096c5d68fc7c85f6453d2c564f6
+    name: storefront
+    urls:
+    - https://github.com/k/saleor-helm/releases/download/storefront-0.1.0/storefront-0.1.0.tgz
+    version: 0.1.0
+generated: "2020-06-14T08:39:44.277717-04:00"
