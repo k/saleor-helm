@@ -1,6 +1,6 @@
 # Saleor Helm Charts
 
-This is an unofficial registry of [Saleor](https://saleorprotocol.com/) [helm](https://helm.sh/) charts.
+This is an unofficial registry of [Saleor](https://saleor.io/) [helm](https://helm.sh/) charts.
 
 ## Prerequisites
 * [Helm](https://helm.sh/) 3+
