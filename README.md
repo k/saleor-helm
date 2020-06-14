@@ -19,7 +19,7 @@ Then configure a values.yaml for the chart you want to install.
 
 ### [saleor](./charts/saleor)
 
-Chart to run [Saleor](https://github.com/mirumee/saleor) with the [Dashboard](###dashboard) and [Storefront](###storefront).
+Chart to run [Saleor](https://github.com/mirumee/saleor) with the [Dashboard](#dashboard) and [Storefront](#storefront).
 
 ### [dashboard](./charts/dashboard)
 
