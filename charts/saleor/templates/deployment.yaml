@@ -12,6 +12,7 @@ spec:
   selector:
     matchLabels:
       {{- include "saleor.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: api
   template:
     metadata:
     {{- with .Values.podAnnotations }}
@@ -20,6 +21,7 @@ spec:
     {{- end }}
       labels:
         {{- include "saleor.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: api
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
@@ -40,12 +42,22 @@ spec:
             - runserver
             - 0.0.0.0:8000
           env:
+            - name: ALLOWED_HOSTS
+              value: localhost,127.0.0.1{{- if .Values.ingress.enabled -}}
+              {{- range .Values.ingress.hosts -}}
+              {{- print "," .host -}}
+              {{- end }}
+              {{- end }}
             - name: STOREFRONT_URL
-              value: http://storefront:3000/
+              value: {{ .Values.storefrontUrl }}
             - name: DASHBOARD_URL
-              value: http://dashboard:9000/
+              value: {{ .Values.dashboardUrl }}
+            - name: REDIS_URL
+              value: {{ template "saleor.redis" . }}/1
             - name: CELERY_BROKER_URL
-              value: {{ template "saleor.redis" . }}
+              value: {{ template "saleor.redis" . }}/0
+            - name: CELERY_RESULT_BACKEND
+              value: {{ template "saleor.redis" . }}/0
             - name: DEFAULT_FROM_EMAIL
               value: {{ .Values.defaultFromEmail }}
             - name: DATABASE_URL

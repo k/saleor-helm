@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "saleor.fullname" . }}-worker
+  labels:
+    {{- include "saleor.labels" . | nindent 4 }}
+spec:
+{{- if not .Values.worker.autoscaling.enabled }}
+  replicas: {{ .Values.worker.replicaCount }}
+{{- end }}
+  selector:
+    matchLabels:
+      {{- include "saleor.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: worker
+  template:
+    metadata:
+    {{- with .Values.worker.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      labels:
+        {{- include "saleor.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: worker
+    spec:
+      {{- with .Values.worker.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "saleor.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.worker.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.worker.securityContext | nindent 12 }}
+          image: "{{ .Values.worker.image.repository }}:{{ .Values.worker.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.worker.image.pullPolicy }}
+          command: ["celery", "-A", "saleor", "worker", "--app=saleor.celeryconf:app", "--loglevel={{ .Values.worker.loglevel }}"]
+          env:
+            - name: REDIS_URL
+              value: {{ template "saleor.redis" . }}/1
+            - name: CELERY_BROKER_URL
+              value: {{ template "saleor.redis" . }}/0
+            - name: CELERY_RESULT_BACKEND
+              value: {{ template "saleor.redis" . }}/0
+            - name: DEFAULT_FROM_EMAIL
+              value: {{ .Values.defaultFromEmail }}
+            - name: DATABASE_URL
+              value: {{ template "saleor.postgresql" . }}
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secretKey.name }}
+                  key: {{ .Values.secretKey.key }}
+          resources:
+            {{- toYaml .Values.worker.resources | nindent 12 }}
+      {{- with (default .Values.worker.nodeSelector .Values.nodeSelector) }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.worker.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.worker.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

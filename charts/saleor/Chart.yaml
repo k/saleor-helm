@@ -5,6 +5,12 @@ type: application
 version: 0.1.0
 appVersion: 2.10.0
 dependencies:
+- name: storefront
+  version: ^0.1.0
+  repository: file://../storefront
+- name: dashboard
+  version: ^0.1.0
+  repository: file://../dashboard
 - name: postgresql
   version: ^8.10.5
   repository: https://charts.bitnami.com/bitnami

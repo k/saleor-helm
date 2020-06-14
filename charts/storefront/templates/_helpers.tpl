@@ -2,7 +2,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "saleor.name" -}}
+{{- define "storefront.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
@@ -11,7 +11,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "saleor.fullname" -}}
+{{- define "storefront.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -27,16 +27,16 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "saleor.chart" -}}
+{{- define "storefront.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "saleor.labels" -}}
-helm.sh/chart: {{ include "saleor.chart" . }}
-{{ include "saleor.selectorLabels" . }}
+{{- define "storefront.labels" -}}
+helm.sh/chart: {{ include "storefront.chart" . }}
+{{ include "storefront.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -46,34 +46,18 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "saleor.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "saleor.name" . }}
+{{- define "storefront.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "storefront.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "saleor.serviceAccountName" -}}
+{{- define "storefront.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "saleor.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "storefront.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
-{{- end }}
-{{- end }}
-
-{{- define "saleor.postgresql" -}}
-{{- if .Values.postgresHost -}}
-{{- .Values.postgresHost }}
-{{- else -}}
-{{- print "postgres://"  .Values.global.postgresql.postgresqlUsername ":" .Values.global.postgresql.postgresqlPassword "@" (include "saleor.fullname" .) "-postgresql" "/saleor" }}
-{{- end }}
-{{- end }}
-
-{{- define "saleor.redis" -}}
-{{- if .Values.redisHost -}}
-{{- .Values.redisHost }}
-{{- else }}
-{{- print "redis://" (include "saleor.fullname" .) "-redis-master:6379" }}
 {{- end }}
 {{- end }}

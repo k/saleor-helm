@@ -1,12 +1,16 @@
-apiVersion: batch/v1
-kind: Job
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: {{ include "saleor.fullname" . }}-migrate
+  name: {{ include "storefront.fullname" . }}
   labels:
-    {{- include "saleor.labels" . | nindent 4 }}
-  annotations:
-    helm.sh/hook: pre-upgrade,post-install
+    {{- include "storefront.labels" . | nindent 4 }}
 spec:
+{{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+{{- end }}
+  selector:
+    matchLabels:
+      {{- include "storefront.selectorLabels" . | nindent 6 }}
   template:
     metadata:
     {{- with .Values.podAnnotations }}
@@ -14,14 +18,13 @@ spec:
         {{- toYaml . | nindent 8 }}
     {{- end }}
       labels:
-        {{- include "saleor.selectorLabels" . | nindent 8 }}
+        {{- include "storefront.selectorLabels" . | nindent 8 }}
     spec:
-      restartPolicy: "Never"
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "saleor.serviceAccountName" . }}
+      serviceAccountName: {{ include "storefront.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
@@ -30,23 +33,20 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          command:
-            - bash
-            - -c
-            - |
-              #!/bin/bash
-              python manage.py migrate && \
-              python manage.py collectstatic --noinput;
-          env:
-            - name: DATABASE_URL
-              value: {{ template "saleor.postgresql" . }}
-            - name: SECRET_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.secretKey.name }}
-                  key: {{ .Values.secretKey.key }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          # livenessProbe:
+          #   httpGet:
+          #     path: /
+          #     port: http
+          # readinessProbe:
+          #   httpGet:
+          #     path: /
+          #     port: http
           resources:
-            {{- toYaml .Values.migrateHook.resources | nindent 12 }}
+            {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

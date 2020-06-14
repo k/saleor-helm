@@ -1,22 +1,10 @@
 global:
-  postgresql:
-    postgresqlDatabase: saleor
-    postgresqlUsername: postgres
-    postgresqlPassword: saleor
-
-defaultFromEmail: noreply@example.com
-storefrontUrl: http://localhost:3000
-dashboardUrl: http://localhost:9000
-
-# kubectl create secret generic saleor-secret --from-literal=secret=$SECRET_HERE
-secretKey:
-  name: saleor-secret
-  key: secret
+  saleorApiUrl: ""
 
 replicaCount: 1
 
 image:
-  repository: kbambridge/saleor
+  repository: kbambridge/saleor-dashboard
   pullPolicy: Always
   # Overrides the image tag whose default is the chart version.
   tag: "latest"
@@ -58,7 +46,8 @@ ingress:
     # kubernetes.io/tls-acme: "true"
   hosts:
     - host: chart-example.local
-      paths: []
+      paths:
+      - /dashboard
   tls: []
   #  - secretName: chart-example-tls
   #    hosts:
@@ -88,29 +77,3 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
-
-storefront: {}
-
-dashboard: {}
-
-worker:
-  loglevel: info
-  replicaCount: 1
-
-  autoscaling:
-    enabled: false
-    minReplicas: 1
-    maxReplicas: 100
-    targetCPUUtilizationPercentage: 80
-    # targetMemoryUtilizationPercentage: 80
-
-  image:
-    repository: kbambridge/saleor-worker
-    pullPolicy: Always
-    # Overrides the image tag whose default is the chart version.
-    tag: "latest"
-
-migrateHook: {}
-
-redis:
-  usePassword: false

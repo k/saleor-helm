@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "saleor.fullname" . }}
+  name: {{ include "storefront.fullname" . }}
   labels:
-    {{- include "saleor.labels" . | nindent 4 }}
+    {{- include "storefront.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
   ports:
@@ -12,5 +12,4 @@ spec:
       protocol: TCP
       name: http
   selector:
-    {{- include "saleor.selectorLabels" . | nindent 4 }}
-    app.kubernetes.io/component: api
+    {{- include "storefront.selectorLabels" . | nindent 4 }}
